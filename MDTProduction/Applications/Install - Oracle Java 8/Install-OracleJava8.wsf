@@ -1,0 +1,98 @@
+<job id="OracleJava8">
+<script language="VBScript" src="..\..\scripts\ZTIUtility.vbs"/>
+<script language="VBScript"> 
+
+'//----------------------------------------------------------------------------
+'// Purpose: Used to Install Java 8
+'// Usage: cscript Install-OracleJava8.wsf [/debug:true]
+'// Version: 1.0 - June 25 2014 - Mikael Nystrom
+'//
+'// This script is provided "AS IS" with no warranties, confers no rights and 
+'// is not supported by the author.
+'//----------------------------------------------------------------------------
+
+Option Explicit 
+Dim iRetVal 
+
+'On Error Resume Next
+iRetVal = ZTIProcess
+ProcessResults iRetVal
+On Error Goto 0 
+
+'//---------------------------------------------------------------------------
+'// Function: ZTIProcess()
+'//---------------------------------------------------------------------------
+Function ZTIProcess() 
+
+	oLogging.CreateEntry oUtility.ScriptName & ": Starting installation", LogTypeInfo
+
+	Dim sFile
+	Dim sDir
+	Dim sDirWOW64
+	Dim sAppFolder
+
+	sFile = oUtility.ScriptDir & "\source\jre-8u66-windows-i586.exe"
+
+	'// Check if we are running a 64bit OS, Prep for Java install as system
+	If oEnvironment.Item("Architecture") = "X64" then
+	sDir = "C:\WINDOWS\system32\config\systemprofile\AppData\LocalLow\Oracle\Java"
+	sDirWOW64 = "C:\WINDOWS\syswow64\config\systemprofile\AppData\LocalLow\Oracle\Java" 
+	sAppFolder = "jre1.8.0_66"
+	oUtility.RunWithHeartbeat("cmd.exe /c mkdir " & sDir)
+	oUtility.RunWithHeartbeat("cmd.exe /c mkdir " & sDirWOW64 & "\" & sAppFolder)
+	oUtility.RunWithHeartbeat("cmd.exe /c mklink /J " & sDir & "\" & sAppFolder & " " & sDirWOW64 & "\" & sAppFolder)
+	End if
+
+	'// Disable Zone Checks
+	oEnv("SEE_MASK_NOZONECHECKS") = 1 		
+	
+	If not oFSO.FileExists(sFile) then
+		oLogging.CreateEntry oUtility.ScriptName & " " & sFile & " was not found, unable to Install", LogTypeError
+		ZTIProcess = Failure
+		Exit Function
+	End if
+	
+	'// Disable Zone Checks
+	oEnv("SEE_MASK_NOZONECHECKS") = 1 
+
+	iRetVal = oUtility.RunWithHeartbeat("""" & sFile & """ /s /L " & oUtility.LogPath & "\jre-8u66-windows-i586.log")
+		
+	if (iRetVal = 0) or (iRetVal = 3010) then
+		ZTIProcess = Success 
+	Else 
+		ZTIProcess = Failure
+	End If
+	
+	'/// Enable Zone Checks
+	oEnv.Remove("SEE_MASK_NOZONECHECKS")	
+	
+	oLogging.CreateEntry oUtility.ScriptName & ": Return code from command = " & iRetVal, LogTypeInfo
+	oLogging.CreateEntry oUtility.ScriptName & ": Finished", LogTypeInfo
+
+	'// Check if we are running a 64bit OS, cleanup after Java
+	If oEnvironment.Item("Architecture") = "X64" then
+	sDir = "C:\WINDOWS\system32\config\systemprofile\AppData\LocalLow\Oracle"
+	sDirWOW64 = "C:\WINDOWS\syswow64\config\systemprofile\AppData\LocalLow\Oracle" 
+	oUtility.RunWithHeartbeat("cmd.exe /c rmdir /S /Q " & sDir)
+	oUtility.RunWithHeartbeat("cmd.exe /c rmdir /S /Q " & sDirWOW64)
+	End if
+	
+End Function 
+
+</script>
+</job>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

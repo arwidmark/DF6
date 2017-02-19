@@ -1,0 +1,153 @@
+﻿<Settings>
+  <DomainDefaults>
+    <OUs>
+     <OU>
+      <Name>Users</Name>
+      <Path></Path>
+     </OU>
+     <OU>
+      <Name>Workstations</Name>
+      <Path></Path>
+     </OU>
+     <OU>
+      <Name>Security Groups</Name>
+      <Path></Path>
+     </OU>
+     <OU>
+      <Name>Internal IT</Name>
+      <Path></Path>
+     </OU>
+     <OU>
+      <Name>Admin Accounts</Name>
+      <Path>OU=Internal IT</Path>
+     </OU>
+     <OU>
+      <Name>Service Accounts</Name>
+      <Path>OU=Internal IT</Path>
+     </OU>
+     <OU>
+      <Name>Servers</Name>
+      <Path>OU=Internal IT</Path>
+     </OU>
+     <OU>
+      <Name>Staging</Name>
+      <Path>OU=Internal IT</Path>
+     </OU>
+     <OU>
+      <Name>Workstations</Name>
+      <Path>OU=Internal IT</Path>
+     </OU>
+     <OU>
+      <Name>Security Groups</Name>
+      <Path>OU=Internal IT</Path>
+     </OU>
+     <OU>
+      <Name>Infrastructure Servers</Name>
+      <Path>OU=Servers,OU=Internal IT</Path>
+     </OU>
+     <OU>
+      <Name>Hyper-V Servers</Name>
+      <Path>OU=Servers,OU=Internal IT</Path>
+     </OU>
+    </OUs>
+    <ADUsers>
+     <ADUser>
+      <UserName>frank.sheep</UserName>
+      <FirstName>Frank</FirstName>
+      <LastName>Sheep</LastName>
+      <Description>The Boss</Description>
+      <OUPath>OU=Users</OUPath>
+      <AccountType>UserAccount</AccountType>
+      <MemberOf>Domain ViaMonstra Management</MemberOf>
+      <PW>P@ssw0rd</PW>
+     </ADUser>
+     <ADUser>
+      <UserName>sue.something</UserName>
+      <FirstName>Sue</FirstName>
+      <LastName>Something</LastName>
+      <Description>The book keeper</Description>
+      <OUPath>OU=Users</OUPath>
+      <AccountType>UserAccount</AccountType>
+      <MemberOf>Domain ViaMonstra Finance</MemberOf>
+      <PW>P@ssw0rd</PW>
+     </ADUser>
+     <ADUser>
+      <UserName>johan.arwidmark</UserName>
+      <FirstName>Johan</FirstName>
+      <LastName>Arwidmark</LastName>
+      <Description>Technical Expert</Description>
+      <OUPath>OU=Users</OUPath>
+      <AccountType>UserAccount</AccountType>
+      <MemberOf>Domain ViaMonstra IT</MemberOf>
+      <PW>P@ssw0rd</PW>
+     </ADUser>
+     <ADUser>
+      <UserName>mikael.nystrom</UserName>
+      <FirstName>Mikael</FirstName>
+      <LastName>Nystrom</LastName>
+      <Description>Technical Expert</Description>
+      <OUPath>OU=Users</OUPath>
+      <AccountType>UserAccount</AccountType>
+      <MemberOf>Domain ViaMonstra IT</MemberOf>
+      <PW>P@ssw0rd</PW>
+     </ADUser>
+     <ADUser>
+      <UserName>kent.agerlund</UserName>
+      <FirstName>Kent</FirstName>
+      <LastName>Agerlund</LastName>
+      <Description>Technical Expert</Description>
+      <OUPath>OU=Users</OUPath>
+      <AccountType>UserAccount</AccountType>
+      <MemberOf>Domain ViaMonstra IT</MemberOf>
+      <PW>P@ssw0rd</PW>
+     </ADUser>
+     <ADUser>
+      <UserName>admminy</UserName>
+      <FirstName>Mikael</FirstName>
+      <LastName>Nystrom</LastName>
+      <Description>Administrator</Description>
+      <OUPath>OU=Admin Accounts,OU=Internal IT</OUPath>
+      <AccountType>AdminAccount</AccountType>
+      <MemberOf>Domain Admins</MemberOf>
+      <PW>P@ssw0rd</PW>
+     </ADUser>
+     <ADUser>
+      <UserName>admjoar</UserName>
+      <FirstName>Johan</FirstName>
+      <LastName>Arwidmark</LastName>
+      <Description>Administrator</Description>
+      <OUPath>OU=Admin Accounts,OU=Internal IT</OUPath>
+      <AccountType>AdminAccount</AccountType>
+      <MemberOf>Domain Admins</MemberOf>
+      <PW>P@ssw0rd</PW>
+     </ADUser>
+     <ADUser>
+      <UserName>admkeag</UserName>
+      <FirstName>Kent</FirstName>
+      <LastName>Agerlund</LastName>
+      <Description>Administrator</Description>
+      <OUPath>OU=Admin Accounts,OU=Internal IT</OUPath>
+      <AccountType>AdminAccount</AccountType>
+      <MemberOf>Domain Admins</MemberOf>
+      <PW>P@ssw0rd</PW>
+     </ADUser>
+    </ADUsers>
+    <ADGroups>
+     <ADGroup>
+      <GroupName>Domain ViaMonstra Management</GroupName>
+      <ADGroupScope>Global</ADGroupScope>
+      <OUPath>OU=Security Groups</OUPath>
+     </ADGroup>
+     <ADGroup>
+      <GroupName>Domain ViaMonstra Finance</GroupName>
+      <ADGroupScope>Global</ADGroupScope>
+      <OUPath>OU=Security Groups</OUPath>
+     </ADGroup>
+     <ADGroup>
+      <GroupName>Domain ViaMonstra IT</GroupName>
+      <ADGroupScope>Global</ADGroupScope>
+      <OUPath>OU=Security Groups,OU=Internal IT</OUPath>
+     </ADGroup>
+    </ADGroups>
+  </DomainDefaults>
+</Settings>

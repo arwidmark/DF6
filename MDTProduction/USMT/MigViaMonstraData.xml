@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<migration urlid="http://www.microsoft.com/migration/1.0/migxmlext/migviamonstradata">
+
+    <!-- This component migrates the ViaMonstra Data folder -->
+    <component type="Documents" context="User">
+        <displayName>The ViaMonstra Data folder</displayName>
+        <role role="Data">
+            <detects>
+				<detect>
+					<condition>MigXmlHelper.DoesObjectExist("File","%SYSTEMDRIVE%\Data")</condition>
+                </detect>
+            </detects>
+			<rules>
+				<include filter='MigXmlHelper.IgnoreIrrelevantLinks()'>
+                    <objectSet>
+                        <pattern type="File">%SYSTEMDRIVE%\Data\* [*]</pattern>
+                    </objectSet>
+                </include>
+            </rules>
+        </role>
+    </component>
+
+
+    <!-- This component migrates all *.pdf files -->
+    <component type="Documents" context="System">
+        <displayName>PDF Documents</displayName>
+        <role role="Data">
+            <rules>
+                <include>
+                    <objectSet>
+                        <script>MigXmlHelper.GenerateDrivePatterns ("* [*.pdf]", "Fixed")</script>
+                    </objectSet>
+                </include>
+				<!-- Make a call to in-built helper function to move all files collected from the above rules to <systemDrive>:\data\PDF Doucments -->
+                <locationModify script="MigXmlHelper.Move('%SYSTEMDRIVE%\Data\PDF Documents')">
+                    <objectSet>
+                        <script>MigXmlHelper.GenerateDrivePatterns ("* [*.pdf]", "Fixed")</script>
+                    </objectSet>
+                </locationModify>
+            </rules>
+        </role>
+    </component>
+
+</migration>

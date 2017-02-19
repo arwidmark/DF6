@@ -1,0 +1,219 @@
+<job id="ZTICheckforTPM_v2"> 
+<script language="VBScript" src="ZTIUtility.vbs"/> 
+<script language="VBScript">
+' // *************************************************************************** 
+' // 
+' // Copyright (c) Microsoft Corporation.  All rights reserved. 
+' // 
+' // Microsoft Deployment Toolkit Solution Accelerator 
+' // 
+' // File:      ZTICheckforTPM.wsf 
+' // 
+' // Version:   5.1.1642.01 
+' // 
+' // Purpose:   Check to see if TPM is enabled and activated 
+' // 
+' // Usage:     cscript ZTICheckforTPM.wsf [/debug:true] 
+' // 
+' // ***************************************************************************
+ '//
+ '// Fixes by Sven Aelterman for correct use of .IsEnabled and .IsActivated
+ 
+Option Explicit 
+RunNewInstance
+ 
+'//---------------------------------------------------------------------------- 
+'// 
+'//  Global constants 
+'// 
+'//----------------------------------------------------------------------------
+ 
+'//---------------------------------------------------------------------------- 
+'//  Main Class 
+'//----------------------------------------------------------------------------
+ 
+Class ZTICheckforTPM_v2
+ 
+    '//---------------------------------------------------------------------------- 
+    '//  Class instance variable declarations 
+    '//---------------------------------------------------------------------------- 
+    Public oTpm 
+    Public bTpmActivated, bTpmEnabled, bTpmReady
+    
+    '//---------------------------------------------------------------------------- 
+    '//  Main routine 
+    '//----------------------------------------------------------------------------
+ 
+    Function Main
+ 
+        Dim iRetVal
+ 
+        iRetVal = Success 
+        
+        iRetVal = TPMValidate()        
+        
+        WScript.Echo "Value of TPMEnabled:   " & oEnvironment.Item("TPMEnabled") 
+        WScript.Echo "Value of TPMActivated: " & oEnvironment.Item("TPMActivated") 
+        WScript.Echo "Value of TPMReady:     " & oEnvironment.Item("TPMReady") 
+		
+        Main = Success
+ 
+    End Function
+	'// 
+	'// END MAIN 
+	'//
+	 
+	'// TPM Management Functions
+	Function GetTpmInstance() 
+    
+        Dim iRetVal, sConnection 
+        Dim oTpmWmi, iTpmWmi
+ 
+        On Error Resume Next
+ 
+        sConnection = "winmgmts:{impersonationLevel=impersonate,authenticationLevel=pktPrivacy}!root\cimv2\Security\MicrosoftTpm"
+ 
+        Set oTpmWmi = GetObject(sConnection) 
+        TestAndFail SUCCESS, 6732, "Failed to Connect to MicrosoftTpm WMI provider"
+ 
+        '// There should either be 0 or 1 instance of the TPM provider class
+        Set iTpmWmi = oTpmWmi.InstancesOf("Win32_Tpm")
+ 
+        If iTpmWmi.Count = 0 Then 
+        
+            oLogging.CreateEntry "Failed find a TPM instance in the provider class.", LogTypeInfo 
+            GetTpmInstance = Failure 
+            Exit Function 
+            
+        End If 
+        Err.Clear
+
+        'Get a single instance of the TPM provider class 
+        Set oTpm = oTpmWmi.Get("Win32_Tpm=@") 
+        TestAndFail SUCCESS, 6733, "Get a TPM instance in the provider class"
+ 
+    End Function
+ 
+    Function TpmValidate() 
+    
+        Dim iRetVal, sCmd, sTpmOwnerPassword 
+        iRetVal = Success
+
+        '// Set oTpm to valid instance
+        iRetVal = GetTpmInstance() 
+        If iRetVal <> Success Then 
+            TPMValidate = Failure 
+            oEnvironment.Item("TPMEnabled") = "FALSE" 
+            oEnvironment.Item("TPMActivated") = "FALSE" 
+            Exit Function 
+        End If
+ 
+        '// Set global booleans for TPM state. Error bubble handled by subs
+        iRetVal = GetTpmEnabled() 
+        If iRetVal <> Success Then 
+            TPMValidate = Failure 
+            oEnvironment.Item("TPMActivated") = "FALSE" 
+            Exit Function 
+        End IF
+ 
+        iRetVal = GetTpmActivated() 
+        If iRetVal <> Success Then 
+            TPMValidate = Failure 
+            oEnvironment.Item("TPMActivated") = "FALSE" 
+            Exit Function 
+        End IF
+ 
+        iRetVal = GetTpmReady() 
+        If iRetVal <> Success Then 
+            TPMValidate = Failure 
+            oEnvironment.Item("TPMReady") = "FALSE" 
+            Exit Function 
+        End IF
+ 
+        TpmValidate = Success
+ 
+    End Function
+ 
+    Function GetTpmEnabled()
+	
+        Dim iRetVal 
+        iRetVal = Success
+ 
+        iRetVal = oTpm.IsEnabled(bTpmEnabled) 
+        If iRetVal <> Success Then 
+			' HACK: 2014-06-05: Sven Aelterman: Fix use of return value and out parameter
+            oLogging.CreateEntry "Determining if TPM is enabled failed with code " & iRetVal, LogTypeError 
+			' Assume it is disabled
+            oEnvironment.Item("TPMEnabled") = "FALSE" 
+            GetTPMEnabled = Failure 
+            Exit Function 
+        
+		Else
+			If bTpmEnabled Then
+				oLogging.CreateEntry bTpmEnabled, LogTypeInfo
+				oEnvironment.Item("TPMEnabled") = "TRUE" 
+				oLogging.CreateEntry "TPM Enabled", LogTypeInfo 
+			End If
+        End If 
+            
+        GetTpmEnabled = Success
+ 
+    End Function
+ 
+    Function GetTpmReady()
+	
+        Dim iRetVal 
+        iRetVal = Success
+ 
+        iRetVal = oTpm.IsReady(bTpmReady) 
+        If iRetVal <> Success Then 
+			' HACK: 2014-06-05: Sven Aelterman: Fix use of return value and out parameter
+            oLogging.CreateEntry "Determining if TPM is ready failed with code " & iRetVal, LogTypeError 
+			' Assume it is disabled
+            oEnvironment.Item("TPMReady") = "FALSE" 
+            GetTPMReady = Failure 
+            Exit Function 
+        
+		Else
+			oLogging.CreateEntry bTpmReady, LogTypeInfo
+			If bTpmReady Then
+				oEnvironment.Item("TPMReady") = "TRUE" 
+				oLogging.CreateEntry "TPM Ready", LogTypeInfo 
+			Else
+				oEnvironment.Item("TPMReady") = "FALSE" 
+				oLogging.CreateEntry "TPM Not Ready", LogTypeInfo 
+			End If
+        End If 
+            
+        GetTpmReady = Success
+ 
+    End Function
+ 
+    Function GetTpmActivated()
+	
+        Dim iRetVal 
+        iRetVal = Success
+ 
+        iRetVal = oTpm.IsActivated(bTpmActivated) 
+        If iRetVal <> Success Then 
+			' HACK: 2014-06-05: Sven Aelterman: Fix use of return value and out parameter
+            oLogging.CreateEntry "Determining if TPM is activated failed with code " & iRetVal, LogTypeError 
+			' Assume it is disabled
+            oEnvironment.Item("TPMActivated") = "FALSE" 
+            GetTPMActivated = Failure 
+            Exit Function 
+        
+		Else
+			If bTpmActivated Then
+				oEnvironment.Item("TPMActivated") = "TRUE" 
+				oLogging.CreateEntry "TPM Is Activated", LogTypeInfo 
+			End If
+        End If 
+		
+        GetTpmActivated = Success
+ 
+    End Function
+	
+End Class 
+</script> 
+</job>

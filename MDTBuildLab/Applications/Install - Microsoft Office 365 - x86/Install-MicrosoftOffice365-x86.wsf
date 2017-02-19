@@ -1,0 +1,77 @@
+<job id="Install-MicrosoftOffice365-x86">
+<script language="VBScript" src="..\..\scripts\ZTIUtility.vbs"/>
+<script language="VBScript"> 
+
+'//----------------------------------------------------------------------------
+'// Solution: Hydration
+'// Purpose: Used to install Microsoft Office 365
+'// Usage: cscript Install-o365.wsf [/debug:true]
+'// Version: 1.0 - 21 Nov 2013 - Mikael Nystrom
+'//
+'// This script is provided "AS IS" with no warranties, confers no rights and 
+'// is not supported by the author. 
+'//
+'//----------------------------------------------------------------------------
+
+'//----------------------------------------------------------------------------
+'// Global constant and variable declarations
+'//---------------------------------------------------------------------------- 
+
+Option Explicit 
+Dim iRetVal 
+
+'//----------------------------------------------------------------------------
+'// End declarations
+'//---------------------------------------------------------------------------- 
+
+'//----------------------------------------------------------------------------
+'// Main routine
+'//---------------------------------------------------------------------------- 
+
+On Error Resume Next
+iRetVal = ZTIProcess
+ProcessResults iRetVal
+On Error Goto 0 
+
+'//---------------------------------------------------------------------------
+'//
+'// Function: ZTIProcess()
+'//
+'// Input: None
+'// 
+'// Return: Success - 0
+'// Failure - non-zero
+'//
+'// Purpose: Perform main ZTI processing
+'// 
+'//---------------------------------------------------------------------------
+Function ZTIProcess() 
+
+    Dim sApp
+	Dim sTargetFolder
+    Dim sSourceFolder
+	Dim sCommand
+		
+	sApp = "Install-MicrosoftOffice365-x86"
+	sTargetFolder = "C:\Minint\O365Inst"
+	sSourceFolder = oUtility.ScriptDir & "\Source"
+	sCommand = sTargetFolder & "\setup.exe /configure " &  sTargetFolder & "\configuration.xml"
+    oLogging.CreateEntry sApp & ": Starting", LogTypeInfo
+    
+    ' Create the destination folder
+    oLogging.CreateEntry sApp & ": Creating target folder", LogTypeInfo
+    oFSO.CreateFolder sTargetFolder
+
+    ' Copy source to destination
+    oLogging.CreateEntry sApp & ": Copying files", LogTypeInfo
+	oFSO.CopyFolder sSourceFolder, sTargetFolder, true
+	
+   	' Run setup
+    oLogging.CreateEntry sApp & ": about to run " & sCommand, LogTypeInfo
+	oUtility.RunWithHeartbeat(sCommand)
+
+	oLogging.CreateEntry sApp & ": Done", LogTypeInfo
+	
+End Function 
+</script>
+</job>

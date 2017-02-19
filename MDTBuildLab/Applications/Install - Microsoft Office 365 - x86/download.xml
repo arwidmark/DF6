@@ -1,0 +1,10 @@
+<Configuration>
+ <Add SourcePath="C:\Setup\DL\Microsoft_Office_2016" OfficeClientEdition="32" Branch="Current" >
+   <Product ID="O365ProPlusRetail">
+     <Language ID="en-us" />
+   </Product>
+   <Product ID="VisioProRetail">
+     <Language ID="en-us" />
+   </Product>
+ </Add>
+</Configuration>
